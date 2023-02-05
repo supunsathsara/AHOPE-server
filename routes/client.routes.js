@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const clientController = require('../controllers/client.controllers');
-
-const userController = require('../controllers/user.controllers');
+const clientController = require('../controllers/client.controller');
 
 router
   .route('/')
-  .get(userController.getAllUsers)
-  .post(userController.createNewUser);
+  .get(clientController.getAllClients)
+  .post(clientController.createNewClient);
+
+router.route('/search').get(clientController.searchClient);
+
+router.route('/select').get(clientController.select);
 
 module.exports = router;

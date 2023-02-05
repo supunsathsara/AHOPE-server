@@ -1,4 +1,3 @@
-const db = require('../config/db');
 const User = require('../models/user.module');
 const { hashPassword, comparePass } = require('../helper/password.helper');
 const {
@@ -9,13 +8,13 @@ const {
 
 exports.getAllUsers = async (req, res, next) => {
   try {
-    //const [rows] = await db.execute('select * from user;');
-    const [rows, _] = await User.findAll();
+    const data = req.query;
+    const [rows, _] = await User.findAll(data);
 
     res.status(200).json({
       status: true,
       code: 200,
-      results: rows.length,
+      results: rows?.length || 0,
       data: { users: rows },
     });
   } catch (err) {
@@ -35,7 +34,6 @@ exports.createNewUser = async (req, res, next) => {
     let { name, email, password, status } = validatedData;
     password = await hashPassword(password);
     data = { name, email, password, status };
-    console.log(data.status);
     const user = new User(data);
     const rows = await user.save();
     res.status(201).json({
@@ -91,6 +89,7 @@ exports.deleteUserById = async (req, res, next) => {
     res.status(204).json({
       status: true,
       code: 204,
+      message: 'User Deleted',
     });
   } catch (err) {
     next(err);
@@ -112,7 +111,7 @@ exports.loginUser = async (req, res, next) => {
     if (rows.length === 0) {
       return res
         .status(401)
-        .json({ status: false, code: 404, message: 'Invalid Email' });
+        .json({ status: false, code: 401, message: 'Invalid Email' });
     }
     const user = rows[0];
     const isMatch = await comparePass(password, user.password);
@@ -127,6 +126,35 @@ exports.loginUser = async (req, res, next) => {
       status: true,
       code: 200,
       message: 'Login Success',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.searchUser = async (req, res, next) => {
+  try {
+    const data = req.query;
+    const [rows, _] = await User.search(data);
+    res.status(200).json({
+      status: true,
+      code: 200,
+      results: rows?.length || 0,
+      data: { users: rows },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.select = async (req, res, next) => {
+  try {
+    const [rows, _] = await User.select();
+    res.status(200).json({
+      status: true,
+      code: 200,
+      results: rows?.length || 0,
+      data: { users: rows },
     });
   } catch (err) {
     next(err);

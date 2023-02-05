@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/user.controllers');
+const userController = require('../controllers/user.controller');
 
 // Get all users and create a user
 router
@@ -9,6 +9,12 @@ router
   .post(userController.createNewUser);
 
 router.route('/login').post(userController.loginUser);
+
+//router.route('/logout').post(userController.logoutUser);
+
+router.route('/search').get(userController.searchUser);
+
+router.route('/select').get(userController.select);
 
 // Get user by id
 router.param('id', (req, res, next, id) => {
